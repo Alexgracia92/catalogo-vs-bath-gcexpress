@@ -2,83 +2,76 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Catálogo Victoria's Secret & Pink</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo VS & Bath</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root { --suave: #fdf2f8; --rosa: #db2777; --gris: #4b5563; }
-        body { background-color: var(--suave); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
-        h1 { text-align: center; color: var(--rosa); }
-
-        /* Filtros */
-        .filtros { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; }
-        button { padding: 8px 16px; border: none; border-radius: 20px; background: white; cursor: pointer; transition: 0.3s; border: 1px solid var(--rosa); color: var(--rosa); }
-        button:hover, button.active { background: var(--rosa); color: white; }
-
-        /* Catálogo */
-        #catalogo { display: grid; grid-template-columns: repeat(auto-fill, 220px); gap: 20px; justify-content: center; }
-        .producto { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .producto img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
-        .btn-carrito { margin-top: 10px; background: var(--rosa); color: white; width: 100%; }
-        
-        /* Barra de carrito */
-        .carrito-flotante { position: fixed; bottom: 20px; right: 20px; background: white; padding: 15px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .card-img-top { height: 250px; object-fit: cover; }
+        .producto-card { transition: transform 0.2s; cursor: pointer; }
+        .producto-card:hover { transform: scale(1.03); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
     </style>
 </head>
-<body>
+<body class="bg-light">
 
-    <h1>CATÁLOGO VICTORIA'S SECRET</h1>
-
-    <div class="filtros" id="menu-filtros">
-        <button class="active" onclick="filtrar('Todos', this)">Todos</button>
-        <button onclick="filtrar('Fragance mist', this)">Fragance Mist</button>
-        <button onclick="filtrar('Fragance lotion', this)">Fragance Lotion</button>
-        <button onclick="filtrar('Perfumes', this)">Perfumes</button>
-        <button onclick="filtrar('Set', this)">Sets</button>
+<div class="container my-5">
+    <h1 class="text-center mb-4">Catálogo VS & Bath</h1>
+    
+    <!-- Barra de búsqueda y Filtros -->
+    <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+            <input type="text" id="buscador" class="form-control mb-3" placeholder="Buscar producto...">
+            <div class="d-flex justify-content-center gap-2 flex-wrap" id="filtros">
+                <button class="btn btn-outline-primary" onclick="filtrar('Todos')">Todos</button>
+                <button class="btn btn-outline-primary" onclick="filtrar('Fragance mist')">Mist</button>
+                <button class="btn btn-outline-primary" onclick="filtrar('Fragance lotion')">Lociones</button>
+                <button class="btn btn-outline-primary" onclick="filtrar('Pink')">Pink</button>
+                <button class="btn btn-outline-primary" onclick="filtrar('Set')">Sets</button>
+            </div>
+        </div>
     </div>
 
-    <div id="catalogo"></div>
+    <div id="catalogo" class="row row-cols-1 row-cols-md-3 g-4"></div>
+</div>
 
-    <div class="carrito-flotante">
-        🛒 Carrito: <span id="contador">0</span> | <button onclick="compartirCarrito()">Compartir</button>
-    </div>
+<script>
+    let productos = [];
 
-    <script>
-        let productos = []; // Aquí cargarás tu JSON
-        let carrito = [];
-
-        // Cargar datos
-        fetch('productos.json').then(r => r.json()).then(data => {
+    fetch('productos.json')
+        .then(res => res.json())
+        .then(data => {
             productos = data;
             mostrarProductos(productos);
         });
 
-        function mostrarProductos(lista) {
-            const cat = document.getElementById('catalogo');
-            cat.innerHTML = lista.map(p => `
-                <div class="producto">
-                    <img src="${p.url_imagen}" alt="${p.nombre}">
-                    <h3>${p.nombre}</h3>
-                    <p>$${p.precio}</p>
-                    <button class="btn-carrito" onclick="agregarAlCarrito('${p.nombre}')">Agregar</button>
+    function mostrarProductos(lista) {
+        const contenedor = document.getElementById('catalogo');
+        contenedor.innerHTML = lista.map(p => `
+            <div class="col">
+                <div class="card h-100 producto-card">
+                    <img src="${p.url_imagen}" class="card-img-top" alt="${p.nombre}">
+                    <div class="card-body">
+                        <h5 class="card-title">${p.nombre}</h5>
+                        <p class="text-muted small">${p.categoria}</p>
+                        <p class="fw-bold text-primary fs-5">$${p.precio}</p>
+                    </div>
                 </div>
-            `).join('');
-        }
+            </div>
+        `).join('');
+    }
 
-        function filtrar(cat, btn) {
-            document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const filtrados = cat === 'Todos' ? productos : productos.filter(p => p.categoria === cat);
-            mostrarProductos(filtrados);
-        }
+    // Buscador
+    document.getElementById('buscador').addEventListener('input', (e) => {
+        const busqueda = e.target.value.toLowerCase();
+        const filtrados = productos.filter(p => p.nombre.toLowerCase().includes(busqueda));
+        mostrarProductos(filtrados);
+    });
 
-        function agregarAlCarrito(nombre) {
-            carrito.push(nombre);
-            document.getElementById('contador').innerText = carrito.length;
-        }
+    // Filtro por categoría
+    function filtrar(cat) {
+        const filtrados = (cat === 'Todos') ? productos : productos.filter(p => p.categoria === cat);
+        mostrarProductos(filtrados);
+    }
+</script>
 
-        function compartirCarrito() {
-            const texto = "Hola, me interesa comprar: " + carrito.join(', ');
-            window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`);
-        }
-    </script>
 </body>
 </html>
