@@ -2,107 +2,83 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Catálogo</title>
+    <title>Catálogo Victoria's Secret & Pink</title>
     <style>
-        body { 
-            font-family: sans-serif; 
-            padding: 20px; 
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Centra horizontalmente todo el contenido */
-            background-color: #f9f9f9;
-        }
+        :root { --suave: #fdf2f8; --rosa: #db2777; --gris: #4b5563; }
+        body { background-color: var(--suave); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        h1 { text-align: center; color: var(--rosa); }
 
-        h1 { 
-            text-align: center; 
-            color: #333;
-            margin-bottom: 30px;
-        }
+        /* Filtros */
+        .filtros { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px; }
+        button { padding: 8px 16px; border: none; border-radius: 20px; background: white; cursor: pointer; transition: 0.3s; border: 1px solid var(--rosa); color: var(--rosa); }
+        button:hover, button.active { background: var(--rosa); color: white; }
 
-        /* Contenedor que agrupa los productos y los centra */
-        #catalogo {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, 220px); /* Subimos a 220px para mejor espacio */
-            gap: 25px;
-            justify-content: center; /* Centra los cuadros en la pantalla */
-            width: 100%;
-            max-width: 1200px;
-        }
+        /* Catálogo */
+        #catalogo { display: grid; grid-template-columns: repeat(auto-fill, 220px); gap: 20px; justify-content: center; }
+        .producto { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .producto img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
+        .btn-carrito { margin-top: 10px; background: var(--rosa); color: white; width: 100%; }
         
-        .producto { 
-            border: 1px solid #e0e0e0; 
-            padding: 15px; 
-            border-radius: 12px; 
-            text-align: center; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #ffffff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Le da un acabado más profesional */
-            box-sizing: border-box;
-            overflow: hidden; /* Evita que cualquier elemento se desborde */
-        }
-        
-        .producto img { 
-            width: 100%; 
-            height: 200px; 
-            object-fit: contain; /* Cambiado a contain para que los frascos de cremas no se corten */
-            border-radius: 6px; 
-            margin-bottom: 15px;
-        }
-
-        /* 👑 AQUÍ ESTÁ EL TRUCO PARA LOS NOMBRES LARGOS */
-        .producto h3 {
-            font-size: 0.95rem; /* Achicamos un poco la letra para que quepa mejor */
-            margin: 10px 0;
-            color: #222;
-            width: 100%; /* Ocupa todo el ancho disponible del cuadro */
-            
-            /* Fuerza a romper el texto largo y los guiones bajos */
-            word-break: break-word; 
-            overflow-wrap: break-word;
-            white-space: normal; 
-            
-            /* Centrado absoluto */
-            display: block;
-            text-align: center;
-        }
-
-        .producto p {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #e91e63; /* Un tono rosa estético para Victoria's Secret */
-            margin: 5px 0 0 0;
-        }
+        /* Barra de carrito */
+        .carrito-flotante { position: fixed; bottom: 20px; right: 20px; background: white; padding: 15px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
-    <h1>CATÁLOGO VICTORIA'S SECRET & BATH & BODY WORKS</h1>
+    <h1>CATÁLOGO VICTORIA'S SECRET</h1>
 
-    <div id="catalogo">Cargando productos...</div>
+    <div class="filtros" id="menu-filtros">
+        <button class="active" onclick="filtrar('Todos', this)">Todos</button>
+        <button onclick="filtrar('Fragance mist', this)">Fragance Mist</button>
+        <button onclick="filtrar('Fragance lotion', this)">Fragance Lotion</button>
+        <button onclick="filtrar('Perfumes', this)">Perfumes</button>
+        <button onclick="filtrar('Set', this)">Sets</button>
+    </div>
+
+    <div id="catalogo"></div>
+
+    <div class="carrito-flotante">
+        🛒 Carrito: <span id="contador">0</span> | <button onclick="compartirCarrito()">Compartir</button>
+    </div>
 
     <script>
-        fetch('productos.json')
-            .then(response => response.json())
-            .then(data => {
-                const contenedor = document.getElementById('catalogo');
-                contenedor.innerHTML = '';
-                data.forEach(p => {
-                    contenedor.innerHTML += `
-                        <div class="producto">
-                            <img src="${p.url_imagen}" alt="${p.nombre}">
-                            <h3>${p.nombre}</h3>
-                            <p>$${parseFloat(p.precio).toFixed(2)}</p>
-                        </div>
-                    `;
-                });
-            })
-            .catch(error => {
-                console.error("Error cargando el JSON:", error);
-                document.getElementById('catalogo').innerHTML = "Error al cargar los productos.";
-            });
+        let productos = []; // Aquí cargarás tu JSON
+        let carrito = [];
+
+        // Cargar datos
+        fetch('productos.json').then(r => r.json()).then(data => {
+            productos = data;
+            mostrarProductos(productos);
+        });
+
+        function mostrarProductos(lista) {
+            const cat = document.getElementById('catalogo');
+            cat.innerHTML = lista.map(p => `
+                <div class="producto">
+                    <img src="${p.url_imagen}" alt="${p.nombre}">
+                    <h3>${p.nombre}</h3>
+                    <p>$${p.precio}</p>
+                    <button class="btn-carrito" onclick="agregarAlCarrito('${p.nombre}')">Agregar</button>
+                </div>
+            `).join('');
+        }
+
+        function filtrar(cat, btn) {
+            document.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filtrados = cat === 'Todos' ? productos : productos.filter(p => p.categoria === cat);
+            mostrarProductos(filtrados);
+        }
+
+        function agregarAlCarrito(nombre) {
+            carrito.push(nombre);
+            document.getElementById('contador').innerText = carrito.length;
+        }
+
+        function compartirCarrito() {
+            const texto = "Hola, me interesa comprar: " + carrito.join(', ');
+            window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`);
+        }
     </script>
 </body>
 </html>
