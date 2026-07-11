@@ -2,33 +2,59 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mi Catálogo</title>
+    <title>Catálogo</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-        .producto { border: 1px solid #ccc; padding: 10px; border-radius: 8px; text-align: center; }
-        .producto img { width: 100%; height: 200px; object-fit: cover; border-radius: 4px; }
+        /* Ajuste para que el título ocupe todo el ancho */
+        h1 { text-align: center; width: 100%; grid-column: 1 / -1; }
+        
+        body { 
+            font-family: sans-serif; 
+            padding: 20px; 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 20px; 
+        }
+        
+        .producto { 
+            border: 1px solid #ccc; 
+            padding: 10px; 
+            border-radius: 8px; 
+            text-align: center; /* Centra el texto */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centra la imagen horizontalmente */
+        }
+        
+        .producto img { 
+            width: 100%; 
+            height: 200px; 
+            object-fit: cover; 
+            border-radius: 4px; 
+        }
     </style>
 </head>
 <body>
 
-<div id="catalogo">Cargando productos...</div>
+    <h1>CATALOGO VICTORIA SECRET Y BATH &BODY WORKS</h1>
 
-<script>
-    fetch('productos.json')
-        .then(response => response.json())
-        .then(data => {
-            const contenedor = document.getElementById('catalogo');
-            contenedor.innerHTML = '';
-            data.forEach(p => {
-                contenedor.innerHTML += `
-                    <div class="producto">
-                        <img src="${p.url_imagen}" alt="${p.nombre}">
-                        <h3>${p.nombre}</h3>
-                        <p>$${p.precio}</p>
-                    </div>
-                `;
+    <div id="catalogo">Cargando productos...</div>
+
+    <script>
+        fetch('productos.json')
+            .then(response => response.json())
+            .then(data => {
+                const contenedor = document.getElementById('catalogo');
+                contenedor.innerHTML = '';
+                data.forEach(p => {
+                    contenedor.innerHTML += `
+                        <div class="producto">
+                            <img src="${p.url_imagen}" alt="${p.nombre}">
+                            <h3>${p.nombre}</h3>
+                            <p>$${p.precio}</p>
+                        </div>
+                    `;
+                });
             });
-        });
-</script>
+    </script>
 </body>
-</html
+</html>
