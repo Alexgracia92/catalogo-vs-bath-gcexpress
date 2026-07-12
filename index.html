@@ -6,15 +6,38 @@
     <title>Catálogo VS & Bath</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .card-img-top { height: 250px; object-fit: cover; }
-        .producto-card { transition: transform 0.2s; cursor: pointer; }
-        .producto-card:hover { transform: scale(1.03); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        /* Estilos de Marca */
+        :root {
+        --vs-pink: #FF66B2;
+        --vs-black: #1A1A1A;
+        }
+        body { background-color: #fcfcfc !important; color: var(--vs-black); }
+        h1 { font-weight: 700; color: var(--vs-black); letter-spacing: -1px; }
+    
+        .card { border: none; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .card-img-top { height: 280px; object-fit: cover; }
+        
+        .btn-outline-primary { 
+            border-color: var(--vs-pink); color: var(--vs-pink); 
+        }
+        .btn-outline-primary:hover { background-color: var(--vs-pink); border-color: var(--vs-pink); color: white; }
+    
+        .btn-success { background-color: var(--vs-pink); border: none; font-weight: 600; }
+        .btn-success:hover { background-color: #ff4da6; }
+    
+        .producto-card { transition: transform 0.3s ease; }
+        .producto-card:hover { transform: translateY(-10px); }
     </style>
 </head>
 <body class="bg-light">
 
 <div class="container my-5">
     <h1 class="text-center mb-4">Catálogo VS & Bath</h1>
+    <p class="text-center lead mb-4 text-muted">
+        Descubre nuestra selección exclusiva de fragancias, lociones y sets de edición limitada. 
+        Encuentra tu aroma favorito y llévate la experiencia de lujo directamente a tu hogar. 
+        ¡Tu próxima fragancia te está esperando!
+    </p>
     
     <!-- Barra de búsqueda y Filtros -->
     <div class="row mb-4">
