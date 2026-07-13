@@ -8,23 +8,22 @@
     <style>
         .card-img-top { height: 200px; object-fit: contain; padding: 10px; }
         #carrito-flotante { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+        /* Nueva mejora visual para productos agotados */
+        .producto-agotado { opacity: 0.6; }
     </style>
 </head>
 <body class="bg-light">
 
 <div class="container my-5">
-    <!-- Título principal y subtítulo -->
     <h1 class="text-center fw-bold mb-1">GC EXPRESS</h1>
     <h4 class="text-center text-secondary mb-3">Catálogo de productos</h4>
     
-    <!-- Descripción del catálogo -->
     <p class="text-center text-muted mb-4 px-md-5">
-        Descubre nuestra selección exclusiva de fragancias, lociones y sets de edición limitada.<br>
+        Descubre nuestra selection exclusiva de fragancias, lociones y sets de edición limitada.<br>
         Encuentra tu aroma favorito y llévate la experiencia de lujo directamente a tu hogar.<br>
         <strong>¡Tu próxima fragancia te está esperando!</strong>
     </p>
 
-    <!-- Botón de TikTok -->
     <div class="text-center mb-5">
         <a href="https://www.tiktok.com/@julygcexpress?_r=1&_t=ZS-97xfGtWP6Gt" target="_blank" class="btn btn-dark btn-sm shadow-sm">
             🎵 Síguenos en TikTok
@@ -34,7 +33,6 @@
     <div id="catalogo" class="row row-cols-2 row-cols-md-3 g-3"></div>
 </div>
 
-<!-- Botón Carrito -->
 <div id="carrito-flotante">
     <button class="btn btn-primary btn-lg shadow" onclick="verCarrito()">🛒 Ver Pedido</button>
 </div>
@@ -57,18 +55,26 @@
 
     function mostrarProductos(lista) {
         const contenedor = document.getElementById('catalogo');
-        contenedor.innerHTML = lista.map(p => `
+        contenedor.innerHTML = lista.map(p => {
+            // Evaluar si el producto está disponible (si no está definido, asumimos true)
+            const esDisponible = p.disponible !== false;
+            
+            return `
             <div class="col">
-                <div class="card h-100 shadow-sm border-0">
+                <div class="card h-100 shadow-sm border-0 ${!esDisponible ? 'producto-agotado' : ''}">
                     <img src="${p.url_imagen}" class="card-img-top" alt="${p.nombre}">
                     <div class="card-body p-2 text-center">
                         <h6 class="card-title text-truncate">${p.nombre}</h6>
                         <p class="fw-bold text-success mb-2">$${p.precio}</p>
-                        <button class="btn btn-sm btn-outline-success w-100" onclick="agregarAlCarrito(${p.id})">Agregar</button>
+                        ${esDisponible 
+                            ? `<button class="btn btn-sm btn-outline-success w-100" onclick="agregarAlCarrito(${p.id})">Agregar</button>` 
+                            : `<button class="btn btn-sm btn-secondary w-100" disabled>Agotado</button>`
+                        }
                     </div>
                 </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     function agregarAlCarrito(id) {
